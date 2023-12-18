@@ -5,7 +5,7 @@ import pandas as pd
 ib = IB()
 # Connecting to localhost, 7496 located in the TWS api settings under 'Socket port'
 # 7497 for paper trading
-ib.connect('127.0.0.1', 7496, clientId=1)
+ib.connect('127.0.0.1', 7497, clientId=1)
 
 #contract = Forex('EURUSD')
 
@@ -28,6 +28,14 @@ market_data = ib.reqMktData(stock, '', False, False)
 #ib.sleep(2)
 
 def onPendingTickers(ticker):
+    print(market_data)
+    print('\n')
+    # Extracting the tick data list (Here i assume the tick list contains all transactions in since last call)
+    for i in range(0, len(market_data.ticks)):
+        print('Size of tick:', market_data.ticks[i].size)
+        print('Tick Type:', market_data.ticks[i].tickType)
+        print('Tick Price:', market_data.ticks[i].price)
+    print(market_data.ticks)
     print('Pending ticker event recieved')
     print('Bid: ')
     print(market_data.bid, market_data.bidSize)
@@ -38,7 +46,7 @@ def onPendingTickers(ticker):
     print('Change')
     print((market_data.ask - market_data.bid))
     print('\n')
-    print(ticker)
+    
 # When we get new data from the earlier request, it shows that information while sending a new request into the system
 ib.pendingTickersEvent += onPendingTickers
 
