@@ -27,6 +27,10 @@ market_data = ib.reqMktData(stock, '', False, False)
 # But this is not great if you want data up-to-date
 #ib.sleep(2)
 
+numTraded = 0
+totalBids = 0
+totalAsk = 0
+
 def onPendingTickers(ticker):
     print(market_data)
     print('\n')
@@ -34,8 +38,32 @@ def onPendingTickers(ticker):
     for i in range(0, len(market_data.ticks)):
         print('Size of tick:', market_data.ticks[i].size)
         print('Tick Type:', market_data.ticks[i].tickType)
+
+        global totalBids
+        global numTraded
+        global totalAsk
+
+        if market_data.ticks[i].tickType == (0 or 1):
+            tickSize = market_data.ticks[i].size
+            totalBids += tickSize
+            print('\nTOTAL BID INCREASED!')
+        elif market_data.ticks[i].tickType == (2 or 3):
+            tickSize = market_data.ticks[i].size
+            totalAsk += tickSize
+            print('\nTOTAL ASK INCREASED!')
+        elif market_data.ticks[i].tickType == (4 or 5):
+            tickSize = market_data.ticks[i].size
+            numTraded += tickSize
+            print('\nTOTAL TRADED INCREASED!')
+
+        print('\nTOTAL BID INCREASED!', totalBids)   
+        print('TOTAL ASK INCREASED!', totalAsk)
+        print('TOTAL TRADED INCREASED!', numTraded)
+
         print('Tick Price:', market_data.ticks[i].price)
-    print(market_data.ticks)
+
+
+    '''print(market_data.ticks)
     print('Pending ticker event recieved')
     print('Bid: ')
     print(market_data.bid, market_data.bidSize)
@@ -45,10 +73,14 @@ def onPendingTickers(ticker):
     print((market_data.ask+market_data.bid)/2)
     print('Change')
     print((market_data.ask - market_data.bid))
-    print('\n')
-    
+    print('\n')'''
+
+    # 0-3 are paired bid-ask
+    # Look for tickTpyes 4 and 5, these indicate lots TRADED
+
 # When we get new data from the earlier request, it shows that information while sending a new request into the system
 ib.pendingTickersEvent += onPendingTickers
+
 
 ib.run()
 
