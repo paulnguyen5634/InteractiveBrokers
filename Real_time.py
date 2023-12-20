@@ -1,5 +1,7 @@
 from ib_insync import *
 import pandas as pd
+from datetime import datetime
+import time
 # util.startLoop()  # uncomment this line when in a notebook
 
 ib = IB()
@@ -30,6 +32,11 @@ market_data = ib.reqMktData(stock, '', False, False)
 numTraded = 0
 totalBids = 0
 totalAsk = 0
+
+def save_data(data):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open('data_log.txt', 'a') as file:
+        file.write(f"{timestamp}: {data}\n")
 
 def onPendingTickers(ticker):
     print(market_data)
@@ -62,6 +69,17 @@ def onPendingTickers(ticker):
 
         print('Tick Price:', market_data.ticks[i].price)
 
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if timestamp[-2:] in ('30','00'):
+            if totalAsk == 0:
+                next
+            with open('result_log1.txt', 'a') as file:
+                file.write(f"{timestamp}: {totalBids}, {totalAsk}, {numTraded}\n")
+            
+            totalBids = 0
+            numTraded = 0
+            totalAsk = 0
+            time.sleep(0.5)
 
     '''print(market_data.ticks)
     print('Pending ticker event recieved')
