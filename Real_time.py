@@ -32,6 +32,7 @@ market_data = ib.reqMktData(stock, '', False, False)
 numTraded = 0
 totalBids = 0
 totalAsk = 0
+stack = []
 
 def save_data(data):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -49,6 +50,7 @@ def onPendingTickers(ticker):
         global totalBids
         global numTraded
         global totalAsk
+        global stack
 
         if market_data.ticks[i].tickType == (0 or 1):
             tickSize = market_data.ticks[i].size
@@ -71,14 +73,19 @@ def onPendingTickers(ticker):
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if timestamp[-2:] in ('30','00'):
-            if totalAsk == 0:
+            if len(stack) == 0:
+                stack.append(timestamp)
+                with open('result_log1.txt', 'a') as file:
+                    file.write(f"{timestamp}: {totalBids}, {totalAsk}, {numTraded}\n")
+            if timestamp[-2:] == stack[-1][-2:]:
+                totalBids = 0
+                numTraded = 0
+                totalAsk = 0
                 next
-            with open('result_log1.txt', 'a') as file:
-                file.write(f"{timestamp}: {totalBids}, {totalAsk}, {numTraded}\n")
+            else:
+                stack.pop()
             
-            totalBids = 0
-            numTraded = 0
-            totalAsk = 0
+            
             time.sleep(0.5)
 
     '''print(market_data.ticks)
