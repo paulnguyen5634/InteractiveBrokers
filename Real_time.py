@@ -75,7 +75,7 @@ def onPendingTickers(ticker):
         if timestamp[-2:] in ('30','00'):
             if len(stack) == 0:
                 stack.append(timestamp)
-                with open('result_log1.txt', 'a') as file:
+                with open(f'{timestamp[:10]}.txt', 'a') as file:
                     file.write(f"{timestamp}: {totalBids}, {totalAsk}, {numTraded}\n")
             if timestamp[-2:] == stack[-1][-2:]:
                 totalBids, numTraded, totalAsk = 0, 0, 0
